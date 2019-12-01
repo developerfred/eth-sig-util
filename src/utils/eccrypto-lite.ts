@@ -1,46 +1,42 @@
-"use strict";
-
 var EC = require("elliptic").ec;
 
 var ec = new EC("secp256k1");
 var cryptoObj = global.crypto || global.msCrypto || {};
 var subtle = cryptoObj.subtle || cryptoObj.webkitSubtle;
 
-module.exports = {
-	decryptWithPrivateKey: async function(privateKey, encrypted) {
-		console.log(privateKey)
-		const twoStripped = privateKey.replace(/^.{2}/g, '');
-		console.log(twoStripped)
-		const encryptedBuffer = {
-        iv: Buffer.from(encrypted.iv, 'hex'),
-        ephemPublicKey: Buffer.from(encrypted.ephemPublicKey, 'hex'),
-        ciphertext: Buffer.from(encrypted.ciphertext, 'hex'),
-        mac: Buffer.from(encrypted.mac, 'hex')
-    };
 
-    const decryptedBuffer = await decrypt(
-        Buffer.from(twoStripped, 'hex'),
-        encryptedBuffer
-    );
-    return decryptedBuffer.toString();
+export function	decryptWithPrivateKey: async function(privateKey, encrypted) {
+  console.log(privateKey)
+  const twoStripped = privateKey.replace(/^.{2}/g, '');
+  console.log(twoStripped)
+  const encryptedBuffer = {
+      iv: Buffer.from(encrypted.iv, 'hex'),
+      ephemPublicKey: Buffer.from(encrypted.ephemPublicKey, 'hex'),
+      ciphertext: Buffer.from(encrypted.ciphertext, 'hex'),
+      mac: Buffer.from(encrypted.mac, 'hex')
+  };
 
-		
-	},
-	encryptWithPublicKey: async function(receiverPublicKey, payload) {
-		const pubString = '04' + receiverPublicKey;
-		const encryptedBuffers = await encrypt(
-        Buffer.from(pubString, 'hex'),
-        Buffer(payload)
-    );
-		const encrypted = {
-        iv: encryptedBuffers.iv.toString('hex'),
-        ephemPublicKey: encryptedBuffers.ephemPublicKey.toString('hex'),
-        ciphertext: encryptedBuffers.ciphertext.toString('hex'),
-        mac: encryptedBuffers.mac.toString('hex')
-    };
-		return encrypted;
-	}
-};
+  const decryptedBuffer = await decrypt(
+      Buffer.from(twoStripped, 'hex'),
+      encryptedBuffer
+  );
+  return decryptedBuffer.toString();		
+}
+  
+export function encryptWithPublicKey: async function(receiverPublicKey, payload) {
+  const pubString = '04' + receiverPublicKey;
+  const encryptedBuffers = await encrypt(
+      Buffer.from(pubString, 'hex'),
+      Buffer(payload)
+  )
+  const encrypted = {
+      iv: encryptedBuffers.iv.toString('hex'),
+      ephemPublicKey: encryptedBuffers.ephemPublicKey.toString('hex'),
+      ciphertext: encryptedBuffers.ciphertext.toString('hex'),
+      mac: encryptedBuffers.mac.toString('hex')
+  }
+  return encrypted;
+}
 
 function assert(condition, message) {
   if (!condition) {
